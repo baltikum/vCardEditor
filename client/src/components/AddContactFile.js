@@ -1,5 +1,5 @@
 import React from 'react'
-
+import './container.css'
 function AddContactFile( { onFileAdded, onUploadFile } ) {
     
     function handleUploadFile(event) {
@@ -12,8 +12,8 @@ function AddContactFile( { onFileAdded, onUploadFile } ) {
 
     return (
         <>
-            <input type="file" onChange={handleFileAdded} />
-            <button onClick={handleUploadFile}>Upload</button>
+            <input type="file" className="button" onChange={handleFileAdded} />
+            <button onClick={handleUploadFile} className="button">Upload</button>
         </>
     )
 }

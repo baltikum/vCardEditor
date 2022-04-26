@@ -2,24 +2,24 @@ import React, { useState,useEffect } from 'react';
 import Contacts from "./components/Contacts";
 import AddContactFile from './components/AddContactFile'
 import axios from 'axios'
+import { v4 as uuid } from 'uuid';
 import './components/container.css'
 
 import './components/contacts-container.css'
 
 
-/* {id:1, name:'Namn', lastname:'Efternamn', telephone:'0739729298', keep:true, edit:false}*/
 
 const LOCAL_STORAGE_KEY = 'contactApp.contacts'
 
 function App() {
 
-  const [contacts, setContacts] = useState([{id:1, name:'Namn', lastname:'Efternamn', telephone:'0739729298', keep:true, edit:false}])
+  const [contacts, setContacts] = useState([])
   const [contactFile,setFile] = useState()
 
   function handleAddContacts(contacts) {
     contacts.map( contact => {
       setContacts( old => {
-        return [...old, {id: 1, name: contact.name,lastname: contact.lastname,telephone: contact.telephone,keep: contact.keep,edit: contact.edit}]
+        return [...old, {id: uuid(), name: contact.name,lastname: contact.lastname,telephone: contact.telephone,keep: contact.keep,edit: contact.edit}]
       })
     })
   }
@@ -78,13 +78,13 @@ function App() {
   function toggleKeep(id) {
     const newContacts = [...contacts]
     const contact = newContacts.find( contact => contact.id === id )
-    contact.keep = ! contact.keep
+    contact.keep = !contact.keep
     setContacts(newContacts)
   }
-  function toggleEdit(id) {
+  function setEdited(id) {
     const newContacts = [...contacts]
     const contact = newContacts.find( contact => contact.id === id )
-    contact.edit = ! contact.edit
+    contact.edit = false
     setContacts(newContacts)
   }
   function editName(id,name) {
@@ -111,10 +111,15 @@ function App() {
   function onUploadFile(event) {
       
       const formData = new FormData();
-
-      formData.append('contacts',contactFile);
-
-      axios.post('/load', formData);
+      formData.append('contacts', contactFile);
+      axios.post("/load", formData).then(
+        (response) => {
+          console.log(response)
+        },
+        (error) => {
+          console.log(error)
+        }
+      );  
 
   }
   function onFileAdded(event) {
@@ -126,12 +131,12 @@ function App() {
       <div className='containers'>
 
         <AddContactFile onFileAdded={onFileAdded} onUploadFile={onUploadFile} />
-        <button onClick={handleRemoveContacts}>Remove all Contacts</button>
-        <button onClick={handleRemoveNonKeepContacts}>Remove all but Keeps</button>
+        <button onClick={handleRemoveContacts} className="button">Remove all Contacts</button>
+        <button onClick={handleRemoveNonKeepContacts} className="button">Remove all but Keeps</button>
 
         <div className='contacts-container'>
           <Contacts contacts={contacts} editName={editName} editLastname={editLastname} 
-            editTelephone={editTelephone} toggleEdit={toggleEdit} toggleKeep={toggleKeep} />
+            editTelephone={editTelephone} setEdited={setEdited} toggleKeep={toggleKeep} />
         </div>
 
         

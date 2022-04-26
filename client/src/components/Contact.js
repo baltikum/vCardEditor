@@ -1,39 +1,50 @@
-import React from 'react'
+import React,{ useState, useEffect, useRef} from 'react'
 import './contact-box.css'
 
-function Contact({ contact, editName, editLastname, editTelephone, toggleEdit,toggleKeep }) {
-  function handleEditName() {
-    editName(contact.id, contact.name)
+function Contact({ contact, editName, editLastname, editTelephone, setEdited, toggleKeep }) {
+
+
+  const [color,setStyle] = useState('')
+
+  const nameInputField = useRef()
+  const lastnameInputField = useRef()
+  const telephoneInputField = useRef()
+
+  function handleEditName(event) {
+    editName(contact.id, nameInputField.current.value)
+    setEdited(contact.id)
   }
-  function handleEditLastname() {
-    editLastname(contact.id, contact.lastname)
+  function handleEditLastname(event) {
+    editLastname(contact.id, lastnameInputField.current.value)
+    setEdited(contact.id)
   }
-  function handleEditTelephone() {
-    editTelephone(contact.id, contact.telephone)
+  function handleEditTelephone(event) {
+    editTelephone(contact.id,telephoneInputField.current.value)
+    setEdited(contact.id)
   }
   function handleKeepBox() {
     toggleKeep(contact.id)
   }
-  function handleEditBox() {
-    toggleEdit(contact.id)
-  }
 
+  useEffect(() => {
+    if (contact.keep) {
+      if (contact.edit) {
+        setStyle('edit')
+      } else {
+        setStyle('keep')
+      }
+    } else {
+      setStyle('remove')
+    }
+  },[handleKeepBox,handleEditName,handleEditLastname,handleEditTelephone])
 
 
   return (
-    <div className="contact-box">
+    <div className={'contact-box ' + color } onClick={handleKeepBox}>
       <h4> {contact.name} {contact.lastname}</h4>
-      <input type="text" className="contact-input" placeholder={contact.name} onChange={handleEditName}></input><br></br>
-      <input type="text" className="contact-input" placeholder={contact.lastname} onChange={handleEditLastname}></input><br></br>
-      <input type="text" className="contact-input" placeholder={contact.telephone} onChange={handleEditTelephone}></input><br></br>
-      
-      <label>Keep
-        <input type="checkbox" checked={contact.keep} onChange={handleKeepBox}></input>
-      </label>
-
-      <label>Edit
-        <input type="checkbox" checked={contact.edit} onChange={handleEditBox}></input>
-      </label>
+      <input type="text" className="contact-input" ref={nameInputField} placeholder={contact.name} onChange={handleEditName}></input><br></br>
+      <input type="text" className="contact-input" ref={lastnameInputField} placeholder={contact.lastname} onChange={handleEditLastname}></input><br></br>
+      <input type="text" className="contact-input" ref={telephoneInputField} placeholder={contact.telephone} onChange={handleEditTelephone}></input>
     </div>
   )
 }
