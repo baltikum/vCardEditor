@@ -2,7 +2,7 @@ import React, { useState,useEffect } from 'react';
 import Contacts from "./components/Contacts";
 import AddContactFile from './components/AddContactFile'
 import axios from 'axios'
-
+import './components/container.css'
 
 import './components/contacts-container.css'
 
@@ -14,15 +14,25 @@ const LOCAL_STORAGE_KEY = 'contactApp.contacts'
 function App() {
 
   const [contacts, setContacts] = useState([{id:1, name:'Namn', lastname:'Efternamn', telephone:'0739729298', keep:true, edit:false}])
-  const [file,setFile] = useState([])
+  const [contactFile,setFile] = useState()
+
+  function handleAddContacts(contacts) {
+    contacts.map( contact => {
+      setContacts( old => {
+        return [...old, {id: 1, name: contact.name,lastname: contact.lastname,telephone: contact.telephone,keep: contact.keep,edit: contact.edit}]
+      })
+    })
+  }
+
 
   const fetchContacts = async () => {
     axios.get('/get').then(
       (response) => {
-          console.log(response.data);
+        handleAddContacts(response.data.contacts)
+        console.log(response.data.contacts);
       },
       (error) => {
-          console.log(error);
+        console.log(error);
       }
     ); 
   }
@@ -40,7 +50,7 @@ function App() {
 
   useEffect(() => {
     fetchContacts()
-  }, []);
+  }, [contactFile]);
 
 
 
@@ -56,8 +66,7 @@ function App() {
 
 
   function handleRemoveContacts() {
-    const newContacts = contacts.filter(contact => !contact)
-    setContacts(newContacts)
+    setContacts([])
   }
   function handleRemoveNonKeepContacts() {
     const newContacts = contacts.filter(contact => contact.keep)
@@ -99,37 +108,38 @@ function App() {
 
 
   //File upload
-  function handleUploadFile(event) {
-
+  function onUploadFile(event) {
+      
       const formData = new FormData();
 
-      formData.append('contacts',{file});
-
-      console.log({file});
+      formData.append('contacts',{contactFile});
 
       axios.post('/load', formData);
 
   }
   function onFileAdded(event) {
-      setFile({selectedFile:event.target.files[0]})
+      setFile(event.target.files[0])
   }
 
   return (
     <>
+      <div className='containers'>
 
-      <AddContactFile onFileAdded={onFileAdded} handleUploadFile={handleUploadFile} />
-      <button onClick={handleRemoveContacts}>Remove all Contacts</button>
-      <button onClick={handleRemoveNonKeepContacts}>Remove all but Keeps</button>
+        <AddContactFile onFileAdded={onFileAdded} onUploadFile={onUploadFile} />
+        <button onClick={handleRemoveContacts}>Remove all Contacts</button>
+        <button onClick={handleRemoveNonKeepContacts}>Remove all but Keeps</button>
 
-      <div className='contacts-container'>
-        <Contacts contacts={contacts} editName={editName} editLastname={editLastname} 
-          editTelephone={editTelephone} toggleEdit={toggleEdit} toggleKeep={toggleKeep} />
+        <div className='contacts-container'>
+          <Contacts contacts={contacts} editName={editName} editLastname={editLastname} 
+            editTelephone={editTelephone} toggleEdit={toggleEdit} toggleKeep={toggleKeep} />
+        </div>
+
+        
+
+        <div>{contacts.filter(contact => !contact.keep).length } contacts to be removed.</div>
+        <div>{contacts.filter(contact => contact.edit).length } contacts needs editing.</div>
+
       </div>
-
-      
-
-      <div>{contacts.filter(contact => !contact.keep).length } contacts to be removed.</div>
-      <div>{contacts.filter(contact => contact.edit).length } contacts needs editing.</div>
     </>
   )
 

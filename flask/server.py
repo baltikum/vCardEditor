@@ -26,6 +26,8 @@ def load_contacts():
     fil = request.get_data(True,True,False)
     data = str(fil)
 
+    print(data)
+
     data = data.splitlines()
     count = 0
     if data:

@@ -87,7 +87,7 @@ class vcard:
     compare_names(self)
 
   def get_json(self):
-    return {'name': str(self.n), 'lastname':str(self.fn),'tel':str(self.tel),'editNames':str(self.editNames),'editTel':str(self.editTel)}
+    return {'name': str(self.n), 'lastname':str(self.fn),'telephone':str(self.tel),'edit':str(self.editNames),'edit':str(self.editTel)}
 
   def __eq__(self, other):
         return self.n == other.n

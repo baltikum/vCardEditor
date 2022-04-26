@@ -1,30 +1,19 @@
-import React, { useState } from 'react'
-import axios from 'axios'
+import React from 'react'
 
-function AddContactFile() {
-    const [file,setFile] = useState([])
-
+function AddContactFile( { onFileAdded, onUploadFile } ) {
+    
     function handleUploadFile(event) {
-
-        const formData = new FormData();
-
-        formData.append('contacts',{file});
-
-        console.log({file});
-
-        axios.post('/load', formData);
-
+        onUploadFile(event)
     }
-    function onFileAdded(event) {
-        setFile({selectedFile:event.target.files[0]})
+
+    function handleFileAdded(event) {
+        onFileAdded(event)
     }
+
     return (
         <>
-            <input type="file" onChange={onFileAdded} />
+            <input type="file" onChange={handleFileAdded} />
             <button onClick={handleUploadFile}>Upload</button>
-
-
-
         </>
     )
 }

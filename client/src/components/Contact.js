@@ -23,16 +23,16 @@ function Contact({ contact, editName, editLastname, editTelephone, toggleEdit,to
   return (
     <div className="contact-box">
       <h4> {contact.name} {contact.lastname}</h4>
-      <input type="text" placeholder={contact.name} onChange={handleEditName}></input><br></br>
-      <input type="text" placeholder={contact.lastname} onChange={handleEditLastname}></input><br></br>
-      <input type="text" placeholder={contact.telephone} onChange={handleEditTelephone}></input><br></br>
+      <input type="text" className="contact-input" placeholder={contact.name} onChange={handleEditName}></input><br></br>
+      <input type="text" className="contact-input" placeholder={contact.lastname} onChange={handleEditLastname}></input><br></br>
+      <input type="text" className="contact-input" placeholder={contact.telephone} onChange={handleEditTelephone}></input><br></br>
       
       <label>Keep
-        <input type="checkbox" className="contact-input" checked={contact.keep} onChange={handleKeepBox}></input>
+        <input type="checkbox" checked={contact.keep} onChange={handleKeepBox}></input>
       </label>
 
       <label>Edit
-        <input type="checkbox" className="contact-input" checked={contact.edit} onChange={handleEditBox}></input>
+        <input type="checkbox" checked={contact.edit} onChange={handleEditBox}></input>
       </label>
     </div>
   )
