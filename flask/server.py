@@ -24,8 +24,8 @@ def load_contacts():
     global cardList,brokenCards,parsedCards
 
     fil = request.get_data(True,True,False)
-
     data = str(fil)
+
     data = data.splitlines()
     count = 0
     if data:
@@ -81,7 +81,7 @@ def load_contacts():
             #print(f'name:{n},  lastname:{fn},  tel:{tel}')
     
 
-    return redirect('/')
+    return redirect('/get')
 
 
 @app.route("/get", methods = ['GET'] )

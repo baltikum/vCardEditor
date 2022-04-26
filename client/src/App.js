@@ -1,93 +1,137 @@
-import React, { useState,useEffect,Component } from 'react';
-import { Contacts } from "./components/Contacts";
+import React, { useState,useEffect } from 'react';
+import Contacts from "./components/Contacts";
+import AddContactFile from './components/AddContactFile'
 import axios from 'axios'
 
 
-class App extends Component {
+import './components/contacts-container.css'
 
 
-  state = {
- 
-    // Initially, no file is selected
-    selectedFile: null
-  };
-  
-  // On file select (from the pop up)
-  onFileChange = event => {
-  
-    // Update the state
-    this.setState({ selectedFile: event.target.files[0] });
-  
-  };
+/* {id:1, name:'Namn', lastname:'Efternamn', telephone:'0739729298', keep:true, edit:false}*/
 
-  // On file upload (click the upload button)
-  onFileUpload = () => {
-      
-    // Create an object of formData
-    const formData = new FormData();
+const LOCAL_STORAGE_KEY = 'contactApp.contacts'
 
-    // Update the formData object
-    formData.append(
-      'contacts',
-      this.state.selectedFile,
-      this.state.selectedFile.name
-    );
+function App() {
 
-    // Details of the uploaded file
-    console.log(this.state.selectedFile);
+  const [contacts, setContacts] = useState([{id:1, name:'Namn', lastname:'Efternamn', telephone:'0739729298', keep:true, edit:false}])
+  const [file,setFile] = useState([])
 
-    // Request made to the backend api
-    // Send formData object
-    axios.post('/load', formData);
-  };
-
-
-
-
-  /*data är variablen, setData är vad vi använder för att påverka den
-  const [contacts,setData] = useState([{}]);
-  useEffect(() => {
-    fetch('/members').then(
-      res => res.json() /* Hämta ifrån backend till json 
-    ).then(
-      data => {
-        setData(data) /*setdata för att påverka variablen 
-        console.log(contacts)
+  const fetchContacts = async () => {
+    axios.get('/get').then(
+      (response) => {
+          console.log(response.data);
+      },
+      (error) => {
+          console.log(error);
       }
-    )
-  }, []); /* tom array för att den enbart skall köras vid första laddnigen
+    ); 
+  }
+
+  const postContacts = () => {
+    axios.post("/load", contacts).then(
+      (response) => {
+        console.log(response)
+      },
+      (error) => {
+        console.log(error)
+      }
+    );   
+  }
+
+  useEffect(() => {
+    fetchContacts()
+  }, []);
 
 
-  return (  
-    <div className="App">
-      <Contacts contacts={contacts}/>
-      <input type="file" onChange={this.onFileChange} />
-        <button onClick={this.onFileUpload}>Upload</button>
-    </div>
- 
-  );
-}*/
 
-render() {
+  //Storing
+  useEffect(() => {
+    const storedContacts = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
+    if (storedContacts) setContacts(storedContacts)
+  }, [] )
+
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY,JSON.stringify(contacts))
+  },[contacts])
+
+
+  function handleRemoveContacts() {
+    const newContacts = contacts.filter(contact => !contact)
+    setContacts(newContacts)
+  }
+  function handleRemoveNonKeepContacts() {
+    const newContacts = contacts.filter(contact => contact.keep)
+    setContacts(newContacts)
+  }
+
+
+  //Contact editing
+  function toggleKeep(id) {
+    const newContacts = [...contacts]
+    const contact = newContacts.find( contact => contact.id === id )
+    contact.keep = ! contact.keep
+    setContacts(newContacts)
+  }
+  function toggleEdit(id) {
+    const newContacts = [...contacts]
+    const contact = newContacts.find( contact => contact.id === id )
+    contact.edit = ! contact.edit
+    setContacts(newContacts)
+  }
+  function editName(id,name) {
+    const newContacts = [...contacts]
+    const contact = newContacts.find( contact => contact.id === id )
+    contact.name = name
+    setContacts(newContacts)
+  }
+  function editLastname(id,lastname) {
+    const newContacts = [...contacts]
+    const contact = newContacts.find( contact => contact.id === id )
+    contact.lastname = lastname
+    setContacts(newContacts)
+  }
+  function editTelephone(id,telephone) {
+    const newContacts = [...contacts]
+    const contact = newContacts.find( contact => contact.id === id )
+    contact.telephone = telephone
+    setContacts(newContacts)
+  }
+
+
+  //File upload
+  function handleUploadFile(event) {
+
+      const formData = new FormData();
+
+      formData.append('contacts',{file});
+
+      console.log({file});
+
+      axios.post('/load', formData);
+
+  }
+  function onFileAdded(event) {
+      setFile({selectedFile:event.target.files[0]})
+  }
+
   return (
-    <div>
-        <h1>
-          GeeksforGeeks
-        </h1>
-        <h3>
-          File Upload using React!
-        </h3>
-        <div>
-            <input type="file" onChange={this.onFileChange} />
-            <button onClick={this.onFileUpload}>
-              Upload!
-            </button>
-        </div>
-      {this.fileData()}
-    </div>
-  );
-}
+    <>
 
+      <AddContactFile onFileAdded={onFileAdded} handleUploadFile={handleUploadFile} />
+      <button onClick={handleRemoveContacts}>Remove all Contacts</button>
+      <button onClick={handleRemoveNonKeepContacts}>Remove all but Keeps</button>
+
+      <div className='contacts-container'>
+        <Contacts contacts={contacts} editName={editName} editLastname={editLastname} 
+          editTelephone={editTelephone} toggleEdit={toggleEdit} toggleKeep={toggleKeep} />
+      </div>
+
+      
+
+      <div>{contacts.filter(contact => !contact.keep).length } contacts to be removed.</div>
+      <div>{contacts.filter(contact => contact.edit).length } contacts needs editing.</div>
+    </>
+  )
 
 
 }

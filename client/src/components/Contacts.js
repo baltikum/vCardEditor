@@ -1,11 +1,18 @@
 import React from 'react';
+import Contact from './Contact'
 
-export const Contacts = ({ contacts}) => {
+export default function Contacts({ contacts, editName, editLastname, editTelephone,toggleEdit, toggleKeep }){
     return (
-        <div>
-            {contacts.length}
-        </div>
 
+
+
+        contacts.map( contact => {
+            return <Contact key={contact.id} contact={contact} editName={editName} editLastname={editLastname} 
+            editTelephone={editTelephone} toggleEdit={toggleEdit} toggleKeep={toggleKeep}/>
+        })
+
+
+        
     )
 
 
