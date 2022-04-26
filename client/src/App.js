@@ -112,7 +112,7 @@ function App() {
       
       const formData = new FormData();
 
-      formData.append('contacts',{contactFile});
+      formData.append('contacts',contactFile);
 
       axios.post('/load', formData);
 
