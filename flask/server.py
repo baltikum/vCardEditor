@@ -1,8 +1,5 @@
-from flask import Flask,request,render_template,redirect,json,jsonify
+from flask import Flask,request,redirect
 import vobject
-import re
-import Vcard
-import html,json
 
 brokenCards = []
 parsedCards = []
@@ -83,9 +80,6 @@ def clear_contacts():
     return f'{parsedCards}{brokenCards}'
 
 
-
-
-
 if __name__ == "__main__":
-    app.run(debug=True)
+      app.run(debug=True)
 
