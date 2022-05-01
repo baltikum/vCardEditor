@@ -5,6 +5,7 @@ function Contact({ contact, editName, editLastname, editTelephone, setEdited, to
 
 
   const [color,setStyle] = useState('')
+  const [hover,setMouseOver] = useState('inactive')
 
   const nameInputField = useRef()
   const lastnameInputField = useRef()
@@ -25,6 +26,12 @@ function Contact({ contact, editName, editLastname, editTelephone, setEdited, to
   function handleKeepBox() {
     toggleKeep(contact.id)
   }
+  function handleMouseOver(event){
+        setMouseOver('active')
+  }
+  function handleMouseLeave(event){
+        setMouseOver('inactive')
+  }
 
   useEffect(() => {
     if (contact.keep) {
@@ -40,7 +47,7 @@ function Contact({ contact, editName, editLastname, editTelephone, setEdited, to
 
 
   return (
-    <div className={'contact-box ' + color } onClick={handleKeepBox}>
+    <div className={'contact-box ' + color+' '+hover } onClick={handleKeepBox} onMouseOver={handleMouseOver} onMouseLeave={handleMouseLeave}>
       <h4> {contact.name} {contact.lastname}</h4>
       <input type="text" className="contact-input" ref={nameInputField} placeholder={contact.name} onChange={handleEditName}></input><br></br>
       <input type="text" className="contact-input" ref={lastnameInputField} placeholder={contact.lastname} onChange={handleEditLastname}></input><br></br>
