@@ -4,106 +4,83 @@ import re
 import Vcard
 import html,json
 
-cardList = []
 brokenCards = []
 parsedCards = []
-vcardlist = []
-jsoncontacts = []
-jsonStr = ''
+
 app = Flask(__name__)
 
 
 
-@app.route('/')
-def index():
-    return render_template("index.html")
-
-
-@app.route("/load", methods = ['POST'] )
+@app.route("/load_contacts", methods = ['POST'] )
 def load_contacts():
-    global cardList,brokenCards,parsedCards
+      global brokenCards,parsedCards
 
-    fil = request.get_data(True,True,False)
-    data = str(fil)
+      cardList = []
 
-    print(data)
+      data = request.get_data(True,True,False)
+      data = str(data)
+      data = data.splitlines()
 
-    data = data.splitlines()
-    count = 0
-    if data:
-        start = False
-        card = False
-        for line in data:
+      if data:
+            start = False
+            card = False
 
-            if not card:
-                newCard = ''
+            for line in data:
 
-            if line.startswith('BEGIN:VCARD'):
-                start = True
-                card = True
-            elif line.startswith('END:VCARD'):
-                card = False
+                  if not card:
+                        newCard = []
 
-            if start:
-                newCard = newCard + line + '\n'
+                  if line.startswith('BEGIN:VCARD'):
+                        start = True
+                        card = True
+                  elif line.startswith('END:VCARD'):
+                        card = False
+
+                  if start:
+                        newCard.append(line + '\n')
+                  
+                  if not card :
+                        if start:
+                              cardList.append(newCard)
+
             
-            if not card :
-                if start:
-                    cardList.append(newCard)
+            for entry in cardList:
+                  vcard = ''.join(entry)
+                  try:    
+                        temp = vobject.readOne(vcard)
+                        if temp not in parsedCards:
+                              parsedCards.append(temp)
+                  except:
+                        brokenCards.append(entry)
+      
+      return redirect('/get')
 
-       
-        for entry in cardList:
-            try:
-                temp = vobject.readOne(entry)
-                parsedCards.append(temp)
-            except:
-                brokenCards.append(entry)
-
-        cardList = []
-        for i in range(len(parsedCards)):
-
-            try:
-                n = parsedCards[i].n.value
-            except AttributeError as e:
-                n = ''
-            try:
-                fn = parsedCards[i].fn.value
-            except AttributeError as e:
-                fn = ''
-            try:
-                tel = parsedCards[i].tel.value
-            except AttributeError as e:
-                tel = ''
-
-            temp = Vcard.vcard(n,fn,tel)
-            if temp not in vcardlist:
-                vcardlist.append(temp)
-
-        
-            #print(f'name:{n},  lastname:{fn},  tel:{tel}')
-    
-
-    return redirect('/get')
-
-
-@app.route("/get", methods = ['GET'] )
+@app.route("/get_parsed", methods = ['GET'] )
 def get_contacts():
-    global vcardlist,jsonStr
+      global parsedCards
+      temp = []
+      for card in parsedCards:
+            temp.append('{')
+            temp.append(f"N:{card.n.value},FN:{card.fn.value},TEL:{card.tel.value}")
+            temp.append('}')
+      temp = ''.join(temp)
+      return '{"contacts":'+ temp + '}'
 
-    jsonStr = json.dumps([entry.get_json() for entry in vcardlist])
-    temp = '{"contacts":'+ str(jsonStr) + '}'
-    return temp
+@app.route("/get_broken", methods = ['GET'] )
+def get_contacts():
+      global brokenCards
+      broken = []
+      for card in brokenCards:
+            broken.append('{ BROKEN:'.join(card) + '}')
 
+      return '{"BROKENCONTACTS"":'.join(broken) +'}'
 
-
-@app.route("/clear", methods = ['GET'] )
+@app.route("/clear", methods = ['POST'] )
 def clear_contacts():
-    global cardList,parsedCards,brokenCards,vcardlist
-    cardList = []
+    global parsedCards,brokenCards
     parsedCards = []
     brokenCards = []
-    vcardlist = []
-    return redirect('/')
+    return f'{parsedCards}{brokenCards}'
 
 
 

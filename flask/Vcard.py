@@ -1,5 +1,4 @@
 import re
-from tkinter import N
 
 class vcard:
 
