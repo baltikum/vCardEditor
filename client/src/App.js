@@ -3,8 +3,8 @@ import Contacts from "./components/Contacts";
 import AddContactFile from './components/AddContactFile'
 import axios from 'axios'
 import { v4 as uuid } from 'uuid';
-import './components/container.css'
 
+import './components/container.css'
 import './components/contacts-container.css'
 
 

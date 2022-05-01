@@ -1,96 +1,50 @@
 import re
+from tkinter import N
 
 class vcard:
 
+  def __init__(self, n, fn, tel):
 
-  def __init__(self, name, lastname, tel):
-    
-    def init_name(self,name):
-      name = str(name)
-      if name == '':
-          self.editNames = True
-      else:
-        if name.isalpha():
-          self.field_name = True
-        else:
-          self.editNames = True
+      if not (isinstance(n, str) and (n is not '')):
+            raise ValueError(f"{n} is either empty or not a string.")
+      self.n = n
 
-      name = name.strip()
-      names = name.split()
-      name = ''
+      if not (isinstance(fn, str) and (fn is not '')):
+            raise ValueError(f"{fn} is either empty or not a string.")
+
+      temp = fn.strip()
+      names = fn.split()
+      edited_name = []
       for entry in names:
-        if entry.isupper():
-          name = name + ' ' + entry
-        else:
-          temp = entry.lower()
-          temp = temp.capitalize()
-          name = name + ' ' + temp
+            if not entry.isupper():
+                  temp = entry.lower()
+                  temp = temp.capitalize()
+            edited_name.append(temp)
+      self.fn = ''.join(edited_name)
 
 
-      self.n = name.strip()
-      return True
-    def init_lastname(self,lastname):
-      lastname = str(lastname)
-      if lastname == '':
-          self.editNames = True
-      else:
-        if lastname.isalpha():
-          self.field_lastname = True
-        else:
-          self.editNames = True
-
-      lastname = lastname.strip()
-      lastnames = lastname.split()
-      lastname = ''
-      for entry in lastnames:
-        if entry.isupper():
-          lastname = lastname + ' ' + entry
-        else:
-          temp = entry.lower()
-          temp = temp.capitalize()
-          lastname = lastname + ' ' + temp
-
-      self.fn = lastname.strip()
-      return True
-    def init_tel(self,tel):
       pattern = re.compile("/[^0-9 +\-]/")
-      tel = str(tel)
-      tel = tel.strip()
+
+      if not (isinstance(tel, str) and not(tel == '') and not (re.match(pattern,tel))):
+            raise ValueError(f"{tel} is either empty, not a string or not a phonenumber.")
+
+      temp = tel.strip()
       country = '+46'
-      if tel != '' and re.match(pattern,tel):
-        self.field_tel = True
-        regex = re.compile(country)
-        match = regex.match(tel)
-        if match:
-          tel = tel.replace(regex, '0')
+      regex = re.compile(country)
 
-      else:
-        self.editTel = True
+      match = regex.match(temp)
+      if match:
+            temp = temp.replace(regex, '0')
 
-      self.tel = tel
-      return True
-    def compare_names(self):
-      if self.fn == self.n:
-        self.editNames = True
-      return True
-    
-    self.field_name = False
-    self.field_lastname = False
-    self.field_tel = False
+      self.tel = temp
 
-    self.editNames = False
-    self.editTel = False
 
-    init_name(self,name)
-    init_lastname(self,lastname)
-    init_tel(self,tel)
-    compare_names(self)
 
-  def get_json(self):
-    return {'name': str(self.n), 'lastname':str(self.fn),'telephone':str(self.tel),'edit':self.editNames,'keep':True}
+def __repr__(self):
+        return f'N:{self.n}FN:{self.fn}TEL:{self.tel}'
 
-  def __eq__(self, other):
-        return self.n == other.n
+def __eq__(self, other):
+        return (self.n == other.n) or (self.tel==other.tel)
 
 
 
